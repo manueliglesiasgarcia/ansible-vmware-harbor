@@ -78,11 +78,16 @@
         RemainAfterExit=yes
 
         WorkingDirectory=/root/harbor
-        ExecStart=/usr/local/bin/docker-compose -f /root/harbor/docker-compose.yml up -d
-        ExecStop=/usr/local/bin/docker-compose -f /root/harbor/docker-compose.yml down
+        ExecStart=/usr/local/bin/docker-compose -f {{harbor_install_dir}}/harbor/docker-compose.yml up -d
+        ExecStop=/usr/local/bin/docker-compose -f {{harbor_install_dir}}/harbor/docker-compose.yml down
         #Restart=always
         [Install]
         WantedBy=multi-user.target
+    register: harbor_service_updated
+    
+- name: Reload systemd    
+  command: systemd daemon-reload
+  when: harbor_service_updated.changed
 
 - name: Start and Enable the service
   service:
