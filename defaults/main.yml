@@ -1,5 +1,7 @@
 ---
 # defaults file for mkgin.vmware-harbor
+harbor_cert_path: "/data/cert/{{harbor_hostname}}.crt"
+harbor_cert_key_path: "/data/cert/{{harbor_hostname}}.key"
 #
 # were to download an unpack installer
 harbor_install_tmp: /tmp/harbor
@@ -8,14 +10,10 @@ harbor_install_dir: /opt/harbor_install
 # current non rc
 harbor_install_download: https://github.com/vmware/harbor/releases/download/v1.1.2/harbor-offline-installer-v1.1.2.tgz
 harbor_install_tgz: harbor-installer.tgz
-harbor_install_https_self_signed: False
-# If true, do not try to install docker or docker-compose with yum
-# set to true to skip this step for testing
-harbor_install_skip_docker_compose: False
 
-# DO NOT use localhost or 127.0.0.1, because Harbor needs to be accessed by external clients.
+# harbor host must be defined DO NOT use localhost or 127.0.0.1, because Harbor needs to be accessed by external clients.
 # set the conservative safe default for testing, must be set to deply
-harbor_hostname: localhost
+# harbor_hostname: localhost
 #The protocol for accessing the UI and token/notification service
 harbor_ui_url_protocol: http
 harbor_db_password: root1234
@@ -24,7 +22,7 @@ harbor_customize_crt: on
 #harbor_ssl_cert: 
 #harbor_ssl_cert_key:
 harbor_ssl_self_days: 100
-harbor_ssl_self_subject: "/O=My Harbor Server/OU=Self signed/CN=test"
+harbor_ssl_self_subject: "/O=My Harbor Server/OU=Self signed/CN={{harbor_hostname}}"
 harbor_secretkey_path: /data
 #harbor_email_server:
 #harbor_email_server_port:
@@ -39,5 +37,3 @@ harbor_auth_mode: db_auth
 harbor_self_registration: on
 # to be safe admin only
 harbor_project_creation_restriction: adminonly
-# safe I guess
-harbor_verify_remote_cert: on

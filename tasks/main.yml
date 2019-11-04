@@ -9,14 +9,23 @@
 
 # make sure we have docker and docker-compose
 - include: docker-compose.yml
-  when: harbor_install_skip_docker_compose == False
-
-#- name: "harbor_install_skip_docker_compose compose ?"
-- debug: var=harbor_install_https_self_signed, verbosity=2
 
 - include: https_self_signed.yml
-  when: harbor_install_https_self_signed == True
+  when: not (harbor_ssl_cert is defined and harbor_ssl_cert_key is defined)
 # otherwise we assume the certificate is there and ok if configured
+
+- name: check or create ssl key dir
+  file: 
+    state: directory
+    path: "{{harbor_cert_path|dirname}}"
+- name: COPY customize certificates
+  copy:
+    src: "{{item[0]}}"
+    dest: "{{item[1]}}" 
+  with_list:
+    - ['{{harbor_ssl_cert}}', '{{harbor_cert_path}}']
+    - ["{{harbor_ssl_cert_key}}", '{{harbor_cert_key_path}}']
+  when: harbor_ssl_cert is defined and harbor_ssl_cert_key is defined
 
 # install harbor
 - include: harbor-install.yml

@@ -28,18 +28,64 @@
     src: '{{ harbor_install_tmp }}/{{ harbor_install_tgz }}'
     dest: '{{ harbor_install_dir }}'
 
+- debug: var=harbor_hostname
 # config template
 - name: upload harbor.cfg from template
   template: 
-    src: harbor.cfg.j2
-    dest: '{{ harbor_install_dir }}/harbor/harbor.cfg'
+    src: harbor.yml.j2
+    dest: '{{ harbor_install_dir }}/harbor/harbor.yml'
+  register: update_harbor_cfg
+
+- name: Prepare harbor yml
+  command: ./prepare
+  args:
+    chdir: '{{ harbor_install_dir }}/harbor'
+  when: update_harbor_cfg.changed
 
 # run installer
-
 - name: run harbor install script
-  shell: './install.sh > {{ harbor_install_dir }}/harbor_install_log.txt'
+  shell: './install.sh --with-clair |tee  {{ harbor_install_dir }}/harbor_install_log.txt'
   args:
     chdir: '{{ harbor_install_dir }}/harbor'
     # don't reinstall / figure out what when wrong and delete or move the logfile
-    creates: '{{ harbor_install_dir }}/harbor_install_log.txt'
+    # creates: '{{ harbor_install_dir }}/harbor_install_log.txt'
+  when: update_harbor_cfg.changed
+- name: Test harbor port is up
+  wait_for:
+      host: 127.0.0.1 
+      port: "{{item}}"
+      connect_timeout: 5 # not required. Maximum number of seconds to wait for a connection to happen before closing and retrying.
+      state: started # not required. choices: absent;drained;present;started;stopped. Either C(present), C(started), or C(stopped), C(absent), or C(drained).,When checking a port C(started) will ensure the port is open, C(stopped) will check that it is closed, C(drained) will check for active connections.,When checking for a file or a search string C(present) or C(started) will ensure that the file or string is present before continuing, C(absent) will check that file is absent or removed.
+  with_items:
+    - 443
+    - 80
+- name: Shutdown harbor and prepare to install it as system service
+  command: docker-compose down
+  args:
+    chdir: '{{harbor_install_dir}}/harbor'
+- name: Create harbor.service to make it run at boot-time
+  copy:
+    dest: /etc/systemd/system/harbor.service
+    mode: 0644
+    content: |
+        [Unit]
+        Description=Servico de manutencao do Harbor
+        After=network.target docker.service
 
+        [Service]
+        #Type=simple
+        Type=oneshot
+        RemainAfterExit=yes
+
+        WorkingDirectory=/root/harbor
+        ExecStart=/usr/local/bin/docker-compose -f /root/harbor/docker-compose.yml up -d
+        ExecStop=/usr/local/bin/docker-compose -f /root/harbor/docker-compose.yml down
+        #Restart=always
+        [Install]
+        WantedBy=multi-user.target
+
+- name: Start and Enable the service
+  service:
+    name: harbor
+    state: started
+    enabled: true
