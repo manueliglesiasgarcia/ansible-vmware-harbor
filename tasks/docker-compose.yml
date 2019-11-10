@@ -26,15 +26,17 @@
     - name: Install docker engine
       package:
         name: "{{ item }}"
-        state: latest
+        state: present
         update_cache: yes
       with_items:
         - docker-ce
+        - nfs-utils
 
     - name: Make sure docker service start
       service:
         name: docker
         state: started
+        enabled: true
 
     - name: Install docker-compose
       get_url:

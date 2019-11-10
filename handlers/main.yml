@@ -1,2 +1,19 @@
 ---
 # handlers file for mkgin.vmware-harbor
+- name: restart harbor service
+  service:
+    name: harbor
+    state: restarted
+    enabled: true
+
+- name: rerun prepare
+  command: ./prepare
+  args:
+    chdir: '{{ harbor_install_dir }}/harbor'
+  notify: restart harbor service
+
+- name: reload systemd    
+  systemd: 
+   daemon-reload: yes
+   notify: restart harbor service
+

@@ -1,8 +1,8 @@
 #
 ---
 # create install dirs
-- debug: var=harbor_install_tmp
-- debug: var=harbor_install_dir
+# - debug: var=harbor_install_tmp
+# - debug: var=harbor_install_dir
 
 - name: create install dir1
   file: 
@@ -14,55 +14,54 @@
     path: '{{ harbor_install_dir }}'
     state: directory
 
-# download or upload tarball
+- name: Check if uploaded already
+  stat:
+    path: '{{ harbor_install_tmp }}/{{ harbor_install_tgz }}'
+  register: harbor_install_package
 
+- name: Check if uploaded already
+  stat:
+    path: '{{ harbor_install_dir }}/harbor'
+  register: harbor_install_folder
+
+# download or upload tarball
 - name: upload local copy
   copy: 
     src: '{{ harbor_install_upload_localcopy_of_installer }}'
+    remote_src: True
     dest: '{{ harbor_install_tmp }}/{{ harbor_install_tgz }}'
-
+  when: not harbor_install_package.stat.exists 
 # unpack 
 - name: unpack harbor_install_tgz
   unarchive: 
     remote_src: True
     src: '{{ harbor_install_tmp }}/{{ harbor_install_tgz }}'
     dest: '{{ harbor_install_dir }}'
+  when: not harbor_install_folder.stat.exists
 
-- debug: var=harbor_hostname
+# - debug: var=harbor_hostname
 # config template
 - name: upload harbor.cfg from template
   template: 
     src: harbor.yml.j2
     dest: '{{ harbor_install_dir }}/harbor/harbor.yml'
   register: update_harbor_cfg
+  notify: rerun prepare
 
-- name: Prepare harbor yml
-  command: ./prepare
+- name: Check install log exists
+  command: cat "{{ harbor_install_dir }}/harbor_install_log.txt"
   args:
-    chdir: '{{ harbor_install_dir }}/harbor'
-  when: update_harbor_cfg.changed
+    removes: "{{ harbor_install_dir }}/harbor_install_log.txt"
+  register: install_log_content
 
 # run installer
 - name: run harbor install script
-  shell: './install.sh --with-clair |tee  {{ harbor_install_dir }}/harbor_install_log.txt'
+  shell: './install.sh --with-clair > {{ harbor_install_dir }}/harbor_install_log.txt' 
   args:
     chdir: '{{ harbor_install_dir }}/harbor'
-    # don't reinstall / figure out what when wrong and delete or move the logfile
-    # creates: '{{ harbor_install_dir }}/harbor_install_log.txt'
-  when: update_harbor_cfg.changed
-- name: Test harbor port is up
-  wait_for:
-      host: 127.0.0.1 
-      port: "{{item}}"
-      connect_timeout: 5 # not required. Maximum number of seconds to wait for a connection to happen before closing and retrying.
-      state: started # not required. choices: absent;drained;present;started;stopped. Either C(present), C(started), or C(stopped), C(absent), or C(drained).,When checking a port C(started) will ensure the port is open, C(stopped) will check that it is closed, C(drained) will check for active connections.,When checking for a file or a search string C(present) or C(started) will ensure that the file or string is present before continuing, C(absent) will check that file is absent or removed.
-  with_items:
-    - 443
-    - 80
-- name: Shutdown harbor and prepare to install it as system service
-  command: docker-compose down
-  args:
-    chdir: '{{harbor_install_dir}}/harbor'
+  when: "'Harbor has been installed and started successfully' not in install_log_content.stdout"
+  
+  
 - name: Create harbor.service to make it run at boot-time
   copy:
     dest: /etc/systemd/system/harbor.service
@@ -83,14 +82,24 @@
         #Restart=always
         [Install]
         WantedBy=multi-user.target
-    register: harbor_service_updated
-    
-- name: Reload systemd    
-  command: systemd daemon-reload
-  when: harbor_service_updated.changed
+  register: harbor_service_updated
+  notify: reload systemd
 
-- name: Start and Enable the service
+- name: flush handlers
+  meta: flush_handlers
+
+- name: Make sure harbor service started and enabled
   service:
     name: harbor
     state: started
-    enabled: true
+    enabled: true  
+
+- name: Test harbor port is up
+  wait_for:
+      host: 127.0.0.1 
+      port: "{{item}}"
+      timeout: 20
+      state: started # not required. choices: absent;drained;present;started;stopped. Either C(present), C(started), or C(stopped), C(absent), or C(drained).,When checking a port C(started) will ensure the port is open, C(stopped) will check that it is closed, C(drained) will check for active connections.,When checking for a file or a search string C(present) or C(started) will ensure that the file or string is present before continuing, C(absent) will check that file is absent or removed.
+  with_items:
+    - 443
+    - 80
