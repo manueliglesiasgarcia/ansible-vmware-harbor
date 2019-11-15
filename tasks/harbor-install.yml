@@ -76,7 +76,7 @@
         Type=oneshot
         RemainAfterExit=yes
 
-        WorkingDirectory=/root/harbor
+        WorkingDirectory={{harbor_install_dir}}/harbor
         ExecStart=/usr/local/bin/docker-compose -f {{harbor_install_dir}}/harbor/docker-compose.yml up -d
         ExecStop=/usr/local/bin/docker-compose -f {{harbor_install_dir}}/harbor/docker-compose.yml down
         #Restart=always
