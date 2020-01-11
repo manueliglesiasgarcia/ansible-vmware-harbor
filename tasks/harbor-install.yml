@@ -1,4 +1,3 @@
-#
 ---
 # create install dirs
 # - debug: var=harbor_install_tmp
@@ -25,7 +24,6 @@
   register: harbor_install_folder
 
 # Download Harbor
-
 - name: "Downloading Harbor {{ harbor_version }} (offline installer)"
   get_url: 
     url: '{{ harbor_url }}'
@@ -60,7 +58,6 @@
   args:
     chdir: '{{ harbor_install_dir }}/harbor'
   when: "'Harbor has been installed and started successfully' not in install_log_content.stdout"
-  
   
 - name: Create harbor.service to make it run at boot-time
   copy:
@@ -119,7 +116,6 @@
     body: "{{ lookup('template', 'templates/create_project.j2') }}"
   when: harbor_projects is defined
   with_items: "{{ harbor_projects }}"
-
 
 - name: "Creating users..."
   uri:
