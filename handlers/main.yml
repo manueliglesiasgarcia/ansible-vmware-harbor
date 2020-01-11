@@ -15,5 +15,3 @@
 - name: reload systemd    
   systemd: 
    daemon-reload: yes
-  #  notify: restart harbor service
-
