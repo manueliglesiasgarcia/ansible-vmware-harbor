@@ -11,6 +11,6 @@
 # maybe set up alternate names but let's not make it too complicated better to make certs
 # with another role
 - name: generate self signed cert with openssl
-  command: openssl req -newkey rsa:4096 -nodes  -sha256 -keyout '{{ harbor_cert_key_path }}' -subj '{{ harbor_ssl_self_subject }}' -new  -x509 -days '{{ harbor_ssl_self_days }}' -out '{{harbor_cert_path }}'
+  command: openssl req -newkey rsa:4096 -nodes  -sha256 -keyout '{{ harbor_cert_key_path }}' -subj '{{ harbor_ssl_self_subject }}' -new  -x509 -days '{{ harbor_ssl_self_days }}' -out '{{ harbor_cert_path }}'
   args:
     creates: '{{ harbor_cert_path }}/cert/{{ harbor_hostname }}.crt' #dont write over a cert
