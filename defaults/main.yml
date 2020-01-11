@@ -1,7 +1,7 @@
 ---
 # defaults file for mkgin.vmware-harbor
-harbor_cert_path: "/data/cert/{{harbor_hostname}}.crt"
-harbor_cert_key_path: "/data/cert/{{harbor_hostname}}.key"
+harbor_cert_path: "/data/cert/{{ harbor_hostname }}.crt"
+harbor_cert_key_path: "/data/cert/{{ harbor_hostname }}.key"
 harbor_version: 1.9.4
 harbor_url: "https://github.com/goharbor/harbor/releases/download/v{{ harbor_version }}/harbor-offline-installer-v{{ harbor_version }}.tgz"
 # were to download an unpack installer
@@ -27,7 +27,7 @@ harbor_customize_crt: on
 #harbor_ssl_cert: 
 #harbor_ssl_cert_key:
 harbor_ssl_self_days: 100
-harbor_ssl_self_subject: "/O=My Harbor Server/OU=Self signed/CN={{harbor_hostname}}"
+harbor_ssl_self_subject: "/O=My Harbor Server/OU=Self signed/CN={{ harbor_hostname }}"
 harbor_secretkey_path: /data
 #harbor_email_server:
 #harbor_email_server_port:
