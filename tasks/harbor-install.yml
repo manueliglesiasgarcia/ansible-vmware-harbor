@@ -56,7 +56,7 @@
 
 # run installer
 - name: run harbor install script
-  shell: './install.sh --with-clair > {{ harbor_install_dir }}/harbor_install_log.txt' 
+  shell: './install.sh {{ harbor_installer_with }} {{ harbor_installer_extra_args }} > {{ harbor_install_dir }}/harbor_install_log.txt' 
   args:
     chdir: '{{ harbor_install_dir }}/harbor'
   when: "'Harbor has been installed and started successfully' not in install_log_content.stdout"

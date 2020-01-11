@@ -2,13 +2,18 @@
 # defaults file for mkgin.vmware-harbor
 harbor_cert_path: "/data/cert/{{harbor_hostname}}.crt"
 harbor_cert_key_path: "/data/cert/{{harbor_hostname}}.key"
-#
+harbor_version: 1.9.4
+harbor_url: "https://github.com/goharbor/harbor/releases/download/v{{ harbor_version }}/harbor-offline-installer-v{{ harbor_version }}.tgz"
 # were to download an unpack installer
 harbor_install_tmp: /tmp/harbor
+harbor_installer_extra_args:
+harbor_extras:
+  # - clair
+  # - notary
+harbor_installer_with: "{% for e in harbor_extras %} {{ '--with-%s'|format(e) }} {% endfor %}"
 # where the installer ends up ( should remain after reboot so not tmp)
 harbor_install_dir: /opt/harbor_install
 # current non rc
-harbor_install_download: https://github.com/vmware/harbor/releases/download/v1.1.2/harbor-offline-installer-v1.1.2.tgz
 harbor_install_tgz: harbor-installer.tgz
 
 # harbor host must be defined DO NOT use localhost or 127.0.0.1, because Harbor needs to be accessed by external clients.

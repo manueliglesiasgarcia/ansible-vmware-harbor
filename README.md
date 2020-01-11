@@ -21,8 +21,6 @@ docker-compse is required
 Network is required for install docker-ce and docker-compose
 Only offline install is tested
 
-harbor version > harbor-offline-installer-v1.9.1-rc1.tgz (newer version harbor use harbor.yml instead harbor.cfg )
-
 
 Example Playbook
 ----------------
@@ -36,6 +34,8 @@ Example Playbook
         - harbor_install_tmp: /root/harbor
         #Folder installed harbor
         - harbor_install_dir: /opt/harbor
+        harbor_extras:
+          - clair
         - harbor_install_upload_localcopy_of_installer: /somelocalpath/harbor-offline-installer-v1.9.1-rc1.tgz
         # The cert and key path is located in your ansible master, not the target hosts
         # The default path for certs is controlled by this role See roles/default/main.yml
