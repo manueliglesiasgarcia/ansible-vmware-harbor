@@ -1,6 +1,6 @@
 galaxy_info:
-  author: Michael Gindonis
-  description: vmware harbor role
+  author: Manuel Iglesias García
+  description: Based on Michael Gindonis work
 #  company: your company (optional)
 
   # If the issue tracker for your role is not on github, uncomment the
@@ -34,6 +34,8 @@ galaxy_info:
   platforms: 
     - name: CentOS
     - name: EL
+    - name: Ubuntu
+    - name: Debian
 
   galaxy_tags:
     - vmware
