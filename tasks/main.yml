@@ -1,8 +1,11 @@
 ---
 # pre install dirs and paths
 - include: harbor-data-directory.yml
-#- name: "harbor_install_skip_docker_compose compose ?"
-- debug: var=harbor_install_skip_docker_compose, verbosity=2
+
+- name: "harbor_install_skip_docker_compose compose ?"
+  debug:
+    var: harbor_install_skip_docker_compose
+    verbosity: 2
 # make sure we have docker and docker-compose
 - include_tasks: install-docker-compose-{{ ansible_os_family }}.yml
 - include: https_self_signed.yml

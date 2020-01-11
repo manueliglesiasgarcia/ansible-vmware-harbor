@@ -10,7 +10,8 @@
         update_cache: yes
 
     - name: Add Docker GPG key
-      apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
 
     - name: Add Docker APT repository
       apt_repository:
