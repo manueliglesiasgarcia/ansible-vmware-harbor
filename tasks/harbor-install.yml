@@ -24,12 +24,13 @@
     path: '{{ harbor_install_dir }}/harbor'
   register: harbor_install_folder
 
-# download or upload tarball
-- name: upload local copy
-  copy: 
-    src: '{{ harbor_install_upload_localcopy_of_installer }}'
-    remote_src: True
+# Download Harbor
+
+- name: "Downloading Harbor {{ harbor_version }} (offline installer)"
+  get_url: 
+    url: '{{ harbor_url }}'
     dest: '{{ harbor_install_tmp }}/{{ harbor_install_tgz }}'
+    validate_certs: "no"
   when: not harbor_install_package.stat.exists 
 # unpack 
 - name: unpack harbor_install_tgz
@@ -39,9 +40,8 @@
     dest: '{{ harbor_install_dir }}'
   when: not harbor_install_folder.stat.exists
 
-# - debug: var=harbor_hostname
 # config template
-- name: upload harbor.cfg from template
+- name: upload harbor.yml from template
   template: 
     src: harbor.yml.j2
     dest: '{{ harbor_install_dir }}/harbor/harbor.yml'
