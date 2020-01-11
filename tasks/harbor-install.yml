@@ -103,3 +103,36 @@
   with_items:
     - 443
     - 80
+
+- name: "Creating projects..."
+  uri:
+    url: "{{ harbor_api_url }}/projects"
+    method: POST
+    user: "admin"
+    password: "{{ harbor_admin_password | default('Harbor12345') }}"
+    status_code:
+      - 201
+      - 409 # already created
+    body_format: json
+    force_basic_auth: yes
+    return_content: yes
+    body: "{{ lookup('template', 'templates/create_project.j2') }}"
+  when: harbor_projects is defined
+  with_items: "{{ harbor_projects }}"
+
+
+- name: "Creating users..."
+  uri:
+    url: "{{ harbor_api_url }}/users"
+    method: POST
+    user: "admin"
+    password: "{{ harbor_admin_password | default('Harbor12345') }}"
+    status_code:
+      - 201
+      - 409 # already created
+    body_format: json
+    force_basic_auth: yes
+    return_content: yes
+    body: "{{ lookup('template', 'templates/create_user.j2') }}"
+  when: harbor_users is defined and harbor_self_registration == "off"
+  with_items: "{{ harbor_users }}"
