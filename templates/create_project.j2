@@ -5,6 +5,9 @@
     "enable_content_trust": "{{ item.content_trust | default ("false") }}",
     "prevent_vul": "{{ item.prevent_vul | default ("true") }}",
     "severity": "{{ item.severity | default ("high") }}",
+    "reuse_sys_cve_whitelist": "{{ item.reuse_sys_cve_whitelist | default ("false") }}",
     "auto_scan": "{{ item.auto_scan | default ("true") }}"
-  }
+  },
+  "storage_limit": {{ item.count_limit | default (-1) }},
+  "count_limit": {{ item.count_limit | default (-1) }}
 }

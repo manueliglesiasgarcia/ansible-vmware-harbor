@@ -3,9 +3,9 @@
   "email": "{{ item.email }}",
   "password": "{{ item.password | default("HarborUser12345") }}",
   "realname": "{{ item.name | default(item.username) }}",
-  "comment": "{{ item.comment | default('') }}",
+  "comment": "{{ item.comment| default("null") }}",
   "deleted": false,
   "role_name": "{{ item.role_name | default("developer") }}",
   "role_id": {{ item.role_id | default(2) }},
-  "has_admin_role": {{ item.has_admin_role | default(true) }},
+  "has_admin_role": {{ item.has_admin_role | default(true) }}
 }
