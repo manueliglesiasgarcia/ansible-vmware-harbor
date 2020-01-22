@@ -1,0 +1,13 @@
+{
+  "status": "{{ item.status | default ("heathy") }}",
+  "credential": {
+      "access_key": "{{ item.usename | default ("admin") }}",
+      "access_secret": "{{ item.password | default ("Harbor12345") }}",
+      "type": "{{ item.type | default ("basic") }}"
+  },
+  "name": "{{ item.registry_name }}",
+  "url": "{{ item.registry_url }}",
+  "insecure": {{ item.registry_insecure | default (true) }},
+  "type": "{{ item.registry_type | default ("harbor") }}",
+  "description": "{{ item.registry_description | default (item.registry_name) }}"
+}

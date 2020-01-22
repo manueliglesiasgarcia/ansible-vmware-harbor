@@ -101,7 +101,55 @@
     - 443
     - 80
 
-- name: "Creating registries..."
+- name: "LDAP configurations..."
+  uri:
+    url: "https://{{ harbor_hostname }}/api/configurations"
+    method: PUT
+    user: "admin"
+    password: "{{ harbor_admin_password | default('Harbor12345') }}"
+    status_code:
+      - 200
+      - 412 # already set
+    body_format: json
+    force_basic_auth: yes
+    return_content: yes
+    body: "{{ lookup('template', 'templates/ldap.j2') }}"
+  when: harbor_ldap is defined and harbor_hostname is defined
+  with_items: "{{ harbor_ldap }}"
+
+- name: "Scheduling Garbage Collection..."
+  uri:
+    url: "https://{{ harbor_hostname }}/api/system/gc/schedule"
+    method: POST
+    user: "admin"
+    password: "{{ harbor_admin_password | default('Harbor12345') }}"
+    status_code:
+      - 201
+      - 412 # already set
+    body_format: json
+    force_basic_auth: yes
+    return_content: yes
+    body: "{{ lookup('template', 'templates/schedule_gc_or_scan_images.j2') }}"
+  when: harbor_schedule_gc is defined and harbor_hostname is defined
+  with_items: "{{ harbor_schedule_gc }}"
+
+- name: "Scheduling Vulnerabitie scan..."
+  uri:
+    url: "https://{{ harbor_hostname }}/api/system/scanAll/schedule"
+    method: POST
+    user: "admin"
+    password: "{{ harbor_admin_password | default('Harbor12345') }}"
+    status_code:
+      - 201
+      - 412
+    body_format: json
+    force_basic_auth: yes
+    return_content: yes
+    body: "{{ lookup('template', 'templates/schedule_gc_or_scan_images.j2') }}"
+  when: harbor_schedule_scan is defined and harbor_hostname is defined
+  with_items: "{{ harbor_schedule_scan }}"
+
+- name: "Add registry..."
   uri:
     url: "https://{{ harbor_hostname }}/api/registries"
     method: POST
@@ -109,15 +157,31 @@
     password: "{{ harbor_admin_password | default('Harbor12345') }}"
     status_code:
       - 201
-      - 409 # already created
+      - 409 # already added
     body_format: json
     force_basic_auth: yes
     return_content: yes
-    body: "{{ lookup('template', 'templates/create_registry.j2') }}"
-  when: harbor_registries is defined and harbor_hostname is defined
-  with_items: "{{ harbor_registries }}"
+    body: "{{ lookup('template', 'templates/add_registry.j2') }}"
+  when: harbor_registry is defined and harbor_hostname is defined
+  with_items: "{{ harbor_registry }}"
 
-- name: "Creating replications..."
+- name: "Add second registry..."
+  uri:
+    url: "https://{{ harbor_hostname }}/api/registries"
+    method: POST
+    user: "admin"
+    password: "{{ harbor_admin_password | default('Harbor12345') }}"
+    status_code:
+      - 201
+      - 409 # already added
+    body_format: json
+    force_basic_auth: yes
+    return_content: yes
+    body: "{{ lookup('template', 'templates/add_registry.j2') }}"
+  when: harbor_secondary_registry is defined and harbor_hostname is defined
+  with_items: "{{ harbor_secondary_registry }}"
+
+- name: "Creating pull replications..."
   uri:
     url: "https://{{ harbor_hostname }}/api/replication/policies"
     method: POST
@@ -132,6 +196,22 @@
     body: "{{ lookup('template', 'templates/replication_pull.j2') }}"
   when: harbor_replication_pull is defined and harbor_hostname is defined
   with_items: "{{ harbor_replication_pull }}"
+
+- name: "Creating push replications..."
+  uri:
+    url: "https://{{ harbor_hostname }}/api/replication/policies"
+    method: POST
+    user: "admin"
+    password: "{{ harbor_admin_password | default('Harbor12345') }}"
+    status_code:
+      - 201
+      - 409 # already created
+    body_format: json
+    force_basic_auth: yes
+    return_content: yes
+    body: "{{ lookup('template', 'templates/replication_push.j2') }}"
+  when: harbor_replication_push is defined and harbor_hostname is defined
+  with_items: "{{ harbor_replication_push }}"
 
 - name: "Creating projects..."
   uri:
@@ -162,5 +242,21 @@
     force_basic_auth: yes
     return_content: yes
     body: "{{ lookup('template', 'templates/create_user.j2') }}"
+  when: harbor_users is defined and harbor_hostname is defined
+  with_items: "{{ harbor_users }}"
+
+- name: "Scan images..."
+  uri:
+    url: "https://{{ harbor_hostname }}/api/users"
+    method: POST
+    user: "admin"
+    password: "{{ harbor_admin_password | default('Harbor12345') }}"
+    status_code:
+      - 201
+      - 409 # already created
+    body_format: json
+    force_basic_auth: yes
+    return_content: yes
+    body: "{{ lookup('template', 'templates/scan_images_scheduled.j2') }}"
   when: harbor_users is defined and harbor_hostname is defined
   with_items: "{{ harbor_users }}"

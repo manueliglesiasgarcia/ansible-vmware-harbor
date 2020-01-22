@@ -1,0 +1,6 @@
+{
+  "schedule": {
+      "type": "{{ item.type | default ("Hourly") }}",
+      "cron": "{{ item.cron }}"
+  }
+}

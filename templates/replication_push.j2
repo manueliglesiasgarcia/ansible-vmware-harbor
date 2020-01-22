@@ -1,0 +1,29 @@
+{
+  "description": "{{ item.project_description | default (item.registry_name) }}",
+  "enabled": {{ item.enable | default ("true") }},
+  "filters": [],
+  "src_registry": null,
+  "dest_registry": {
+    "status": "{{ item.status | default ("heathy") }}",
+    "credential": {
+      "access_key": "{{ item.usename | default ("admin") }}",
+      "access_secret": "{{ item.password | default ("Harbor12345") }}",
+      "type": "{{ item.type | default ("basic") }}"
+    },
+    "name": "{{ item.registry_name }}",
+    "url": "{{ item.registry_url }}",
+    "insecure": {{ item.registry_insecure | default (true) }},
+    "type": "{{ item.registry_type | default ("harbor") }}",
+    "id": {{ item.registry_id | default (1) }}
+  },
+  "dest_namespace": null,
+  "trigger": {
+    "type": "{{ item.scheduled | default ("scheduled") }}",
+    "trigger_settings": {
+      "cron": "{{ item.registry_pull_cron | default ("0 0 * * * *") }}"
+    }
+  },
+  "deletion": {{ item.deletion | default (false) }},
+  "override": {{ item.override | default (true) }},
+  "name": "{{ item.project_name }}"
+}
