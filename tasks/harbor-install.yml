@@ -4,7 +4,7 @@
 # - debug: var=harbor_install_dir
 
 - name: create install dir1
-  file: 
+  file:
     path: '{{ harbor_install_tmp }}'
     state: directory
 
@@ -25,14 +25,14 @@
 
 # Download Harbor
 - name: "Downloading Harbor {{ harbor_version }} (offline installer)"
-  get_url: 
+  get_url:
     url: '{{ harbor_url }}'
     dest: '{{ harbor_install_tmp }}/{{ harbor_install_tgz }}'
     validate_certs: "no"
-  when: not harbor_install_package.stat.exists 
+  when: not harbor_install_package.stat.exists
 # unpack 
 - name: unpack harbor_install_tgz
-  unarchive: 
+  unarchive:
     remote_src: True
     src: '{{ harbor_install_tmp }}/{{ harbor_install_tgz }}'
     dest: '{{ harbor_install_dir }}'
@@ -40,7 +40,7 @@
 
 # config template
 - name: upload harbor.yml from template
-  template: 
+  template:
     src: harbor.yml.j2
     dest: '{{ harbor_install_dir }}/harbor/harbor.yml'
   register: update_harbor_cfg
@@ -54,11 +54,11 @@
 
 # run installer
 - name: run harbor install script
-  shell: './install.sh {{ harbor_installer_with }} {{ harbor_installer_extra_args }} > {{ harbor_install_dir }}/harbor_install_log.txt' 
+  shell: './install.sh {{ harbor_installer_with }} {{ harbor_installer_extra_args }} > {{ harbor_install_dir }}/harbor_install_log.txt'
   args:
     chdir: '{{ harbor_install_dir }}/harbor'
   when: "'Harbor has been installed and started successfully' not in install_log_content.stdout"
-  
+
 - name: Create harbor.service to make it run at boot-time
   copy:
     dest: /etc/systemd/system/harbor.service
@@ -89,14 +89,14 @@
   service:
     name: harbor
     state: started
-    enabled: true  
+    enabled: true
 
 - name: Test harbor port is up
   wait_for:
-      host: 127.0.0.1 
+      host: 127.0.0.1
       port: "{{ item }}"
       timeout: 20
-      state: started # not required. choices: absent;drained;present;started;stopped. Either C(present), C(started), or C(stopped), C(absent), or C(drained).,When checking a port C(started) will ensure the port is open, C(stopped) will check that it is closed, C(drained) will check for active connections.,When checking for a file or a search string C(present) or C(started) will ensure that the file or string is present before continuing, C(absent) will check that file is absent or removed.
+      state: started
   with_items:
     - 443
     - 80

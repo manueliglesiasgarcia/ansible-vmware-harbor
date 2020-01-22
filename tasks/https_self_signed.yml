@@ -1,16 +1,18 @@
 ---
 - name: Check required variable is defined
   fail:
-      msg: 'Failed as required variable is not defined' 
-  when: harbor_hostname is not defined or harbor_ssl_self_days is not defined or harbor_ssl_self_subject is not defined    
+      msg: 'Failed as required variable is not defined'
+  when: harbor_hostname is not defined or harbor_ssl_self_days is not defined or harbor_ssl_self_subject is not defined
 - name: check or create ssl key dir
-  file: 
+  file:
     state: directory
     path: "{{ harbor_install_dir }}/cert"
 
 # maybe set up alternate names but let's not make it too complicated better to make certs
 # with another role
-- name: generate self signed cert with openssl
-  command: openssl req -newkey rsa:4096 -nodes  -sha256 -keyout '{{ harbor_cert_key_path }}' -subj '{{ harbor_ssl_self_subject }}' -new  -x509 -days '{{ harbor_ssl_self_days }}' -out '{{ harbor_cert_path }}'
-  args:
-    creates: '{{ harbor_cert_path }}/cert/{{ harbor_hostname }}.crt' #dont write over a cert
+
+- name: Generate a Self Signed OpenSSL certificate
+  openssl_certificate:
+    path: "{{ harbor_cert_path }}"
+    privatekey_path: "{{ harbor_cert_key_path }}"
+    provider: selfsigned

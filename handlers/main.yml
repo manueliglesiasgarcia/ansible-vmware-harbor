@@ -12,6 +12,6 @@
     chdir: '{{ harbor_install_dir }}/harbor'
   notify: restart harbor service
 
-- name: reload systemd    
-  systemd: 
+- name: reload systemd
+  systemd:
    daemon-reload: yes

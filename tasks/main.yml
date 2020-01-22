@@ -12,13 +12,13 @@
   when: not (harbor_ssl_cert is defined and harbor_ssl_cert_key is defined)
 # otherwise we assume the certificate is there and ok if configured
 - name: check or create ssl key dir
-  file: 
+  file:
     state: directory
     path: "{{ harbor_cert_path|dirname }}"
 - name: COPY customize certificates
   copy:
     src: "{{ item[0] }}"
-    dest: "{{ item[1] }}" 
+    dest: "{{ item[1] }}"
   with_list:
     - ['{{ harbor_ssl_cert }}', '{{ harbor_cert_path }}']
     - ["{{ harbor_ssl_cert_key }}", '{{ harbor_cert_key_path }}']

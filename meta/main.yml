@@ -8,11 +8,17 @@ galaxy_info:
 
   github_branch: master
 
-  platforms: 
-    - name: CentOS
+  platforms:
     - name: EL
-    - name: Ubuntu
+      versions:
+        - 7
     - name: Debian
+      versions:
+        - jessie
+        - stretch
+    - name: Ubuntu
+      versions:
+        - bionic
 
   galaxy_tags:
     - vmware

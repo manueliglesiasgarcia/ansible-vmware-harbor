@@ -7,7 +7,7 @@
         state: present
 
     - name: Install docker-ce repo
-      yum_repository: 
+      yum_repository:
         name: 'docker-ce'
         description: 'Docker official repo'
         baseurl: https://mirrors.aliyun.com/docker-ce/linux/centos/7/$basearch/stable
