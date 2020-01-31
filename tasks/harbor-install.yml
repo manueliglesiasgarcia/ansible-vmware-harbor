@@ -75,7 +75,7 @@
 
         WorkingDirectory={{ harbor_install_dir }}/harbor
         ExecStart=/usr/local/bin/docker-compose -f {{ harbor_install_dir }}/harbor/docker-compose.yml up -d
-        ExecStop=/usr/local/bin/docker-compose -f {{ harbor_install_dir }}/harbor/docker-compose.yml down
+        ExecStop=/usr/local/bin/docker-compose -f {{ harbor_install_dir }}/harbor/docker-compose.yml down -v
         #Restart=always
         [Install]
         WantedBy=multi-user.target
