@@ -157,10 +157,10 @@ proxy:
   http_proxy:
   https_proxy:
   no_proxy: 127.0.0.1,localhost,.local,.internal,log,db,redis,nginx,core,portal,postgresql,jobservice,registry,registryctl,{% for item in harbor_extras %}{{ item }},{% endfor %}
+
   components:
     - core
     - jobservice
-    - clair
 {% for item in harbor_extras %}
     - {{ item }}
 {% endfor %}
