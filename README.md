@@ -28,7 +28,7 @@ Example Playbook
 - hosts: harbor
   become: true
   roles:
-    - role: mandruis.ansible_vmware_harbor
+    - role: manueliglesiasgarcia.ansible_vmware_harbor
       vars:
         # Add a project
         harbor_projects:
